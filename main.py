@@ -1,7 +1,9 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class MatrixEnsemble:
+
     @staticmethod
     def generate_matrix(gen_method: callable, size: int) -> np.ndarray:
         result = np.zeros([size, size])
@@ -16,7 +18,7 @@ class MatrixEnsemble:
         avg: float = 0.0,
         sigma: float = 1.0,
         size_ensemble: int = 1000,
-        size_matrix: int = 2,
+        matrix_sizes: tuple[int] = (2, 4, 16),
         mode: int = 0,
     ):
         self.norm_deltas = []
@@ -27,31 +29,38 @@ class MatrixEnsemble:
                 case 0:
                     self.ensemble.append(
                         self.generate_matrix(
-                            lambda: np.random.normal(avg, sigma), size_matrix
+                            lambda: np.random.normal(avg, sigma), np.random.choice(matrix_sizes)
                         )
                     )
                 case 1:
                     self.ensemble.append(
                         self.generate_matrix(
-                            lambda: np.random.choice([-1, 1]), size_matrix
+                            lambda: np.random.choice([-1, 1]), np.random.choice(matrix_sizes)
                         )
                     )
 
     def gen_hist(self):
         for matrix in self.ensemble:
-            eigenvalues = np.sort(np.real(np.linalg.eigvals(matrix)))
-            deltas = np.diff(eigenvalues)
-            mean = np.mean(deltas)
-            deltas_norm = deltas / mean
-            for delta in deltas_norm:
-                self.norm_deltas.append(delta)
+            eigenvalues = np.real(np.linalg.eigvals(matrix))
+            sorted_eigenvalues = np.sort(eigenvalues)
+            diffs = np.diff(sorted_eigenvalues)
+            mean_diff = np.mean(diffs)
+            normalized_diffs = diffs / mean_diff
+            for diff in normalized_diffs:
+                self.norm_deltas.append(diff)
+        return self.norm_deltas
 
 
 if __name__ == "__main__":
-    a = MatrixEnsemble()
-    result = a.generate_matrix(lambda: 1, 2)
-    assert len(result) == 2
-    for i in range(2):
-        assert len(result[i]) == 2
-        for j in range(2):
-            assert result[i][j] == 1
+    a = MatrixEnsemble(mode=1)
+    deltas = a.gen_hist()
+    x = np.sort(np.array(deltas))
+    y = np.pi * x / 2 * np.power(np.e, -np.pi * x**2 / 4)
+    plt.figure()
+    plt.hist(
+        deltas,
+        bins=20,
+        density=True,
+    )
+    plt.plot(x, y, color="r")
+    plt.show()
