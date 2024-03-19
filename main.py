@@ -29,13 +29,15 @@ class MatrixEnsemble:
                 case 0:
                     self.ensemble.append(
                         self.generate_matrix(
-                            lambda: np.random.normal(avg, sigma), np.random.choice(matrix_sizes)
+                            lambda: np.random.normal(avg, sigma),
+                            np.random.choice(matrix_sizes),
                         )
                     )
                 case 1:
                     self.ensemble.append(
                         self.generate_matrix(
-                            lambda: np.random.choice([-1, 1]), np.random.choice(matrix_sizes)
+                            lambda: np.random.choice([-1, 1]),
+                            np.random.choice(matrix_sizes),
                         )
                     )
 
@@ -63,4 +65,6 @@ if __name__ == "__main__":
         density=True,
     )
     plt.plot(x, y, color="r")
+    plt.xlabel("Значение")
+    plt.ylabel("Количество")
     plt.show()

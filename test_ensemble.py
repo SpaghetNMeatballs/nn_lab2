@@ -11,7 +11,3 @@ def test_gen_matrix():
             assert result[i][j] == 1
 
 
-def test_gen_ensemble():
-    a = MatrixEnsemble(mode=1)
-    for matrix in a.ensemble:
-
